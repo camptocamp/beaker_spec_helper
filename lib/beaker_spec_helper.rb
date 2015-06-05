@@ -1,42 +1,5 @@
 module BeakerSpecHelper
 
-  hosts.each do |host|
-    # Workaround for Ubuntu utopic and vivid
-    if host['platform'] =~ /ubuntu-(14.10|15.04)/
-      # Ugly Monkey patching...
-      module Beaker::DSL::InstallUtils::PuppetUtils
-        def install_puppet_from_deb( host, opts )
-          if ! host.check_for_package 'lsb-release'
-            host.install_package('lsb-release')
-          end
-
-          if ! host.check_for_command 'curl'
-            on host, 'apt-get install -y curl'
-          end
-
-          on host, 'curl -O http://apt.puppetlabs.com/puppetlabs-release-trusty.deb'
-          on host, 'dpkg -i puppetlabs-release-trusty.deb'
-          on host, 'apt-get update'
-
-          if opts[:facter_version]
-            on host, "apt-get install -y facter=#{opts[:facter_version]}-1puppetlabs1"
-          end
-
-          if opts[:hiera_version]
-            on host, "apt-get install -y hiera=#{opts[:hiera_version]}-1puppetlabs1"
-          end
-
-          if opts[:version]
-            on host, "apt-get install -y puppet-common=#{opts[:version]}-1puppetlabs1"
-            on host, "apt-get install -y puppet=#{opts[:version]}-1puppetlabs1"
-          else
-            on host, 'apt-get install -y puppet'
-          end
-        end
-      end
-    end
-  end
-
   ###
   # Copied/pasted/adapted from puppetlabs_spec_helper's lib/puppetlabs_spec_helper/rake_tasks.rb
   #
